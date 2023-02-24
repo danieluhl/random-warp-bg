@@ -6,6 +6,7 @@ const path = require("path");
 const homedir = require("os").homedir();
 
 function getImage() {
+  console.log("FETCHING new background!");
   return axios.get(IMAGE_URL).then(function({ data }) {
     // scrape the image
     let $ = cheerio.load(data);
