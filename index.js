@@ -14,9 +14,12 @@ function getImage(theme = "night_owl") {
   return axios.get(IMAGE_URL).then(function({ data }) {
     // scrape the image
     let $ = cheerio.load(data);
-    const firstImageUrl = $(".container .content img:first")[
-      Math.floor(Math.random() * 5)
-    ].attribs.src;
+
+    const images = $(".container .content img");
+    // grab one of the top half of all the images on the main page
+    const imageIndex = Math.floor((Math.random() * images.length) / 2);
+    const firstImageUrl = $(".container .content img")[imageIndex].attribs.src;
+
     // save the image
     axios({
       method: "get",
