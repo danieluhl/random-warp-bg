@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 const IMAGE_URL = "https://deepdreamgenerator.com/";
 const cheerio = require("cheerio");
