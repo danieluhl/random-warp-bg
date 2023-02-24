@@ -18,8 +18,8 @@ function getImage(theme = "night_owl") {
     const images = $(".container .content img.light-gallery-item");
     // grab one of the top half of all the images on the main page
     const imageIndex = Math.floor((Math.random() * images.length) / 2);
-    const firstImageUrl = $(".container .content img")[imageIndex].attribs.src;
-
+    console.log(images[imageIndex].attribs);
+    const firstImageUrl = images[imageIndex].attribs.src;
     // save the image
     axios({
       method: "get",
