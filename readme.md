@@ -1,8 +1,24 @@
-# Run this to swap out your warp theme background with the latest one from deep
+# Random warp bg fetcher
 
-dream generator
+Scrapes the latest deep dream image and downloads it into your warp theme
+directory.
 
-You'll want to change the output path to your custom theme path. Mine is Dank
-Owl, find more on that here:
+Be sure to have a custom theme at `~/.warp/themes/[theme]`
 
+This will output `deep.jpg` so you'll want your theme to have:
+
+```
+background_image:
+  path: [theme]/deep.jpg
+  opacity: 20
+```
+
+## Example Usage
+
+```bash
+# downloads to ~/.warp/themes/night_owl/deep.jpg
+node index.js night_owl
+```
+
+More about my setup and custom "Dank Owl" theme:
 https://dev.to/danieluhl/dank-owl-custom-themes-in-warp-terminal-and-neovim-4a24
