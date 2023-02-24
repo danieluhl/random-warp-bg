@@ -10,12 +10,12 @@ const homedir = require("os").homedir();
 const argv = require("yargs/yargs")(process.argv.slice(2)).argv;
 
 function getImage(theme = "night_owl") {
-  console.log("FETCHING new background!");
+  console.log(`Fetching new background for your warp theme ${theme}`);
   return axios.get(IMAGE_URL).then(function({ data }) {
     // scrape the image
     let $ = cheerio.load(data);
 
-    const images = $(".container .content img");
+    const images = $(".container .content img.light-gallery-item");
     // grab one of the top half of all the images on the main page
     const imageIndex = Math.floor((Math.random() * images.length) / 2);
     const firstImageUrl = $(".container .content img")[imageIndex].attribs.src;
