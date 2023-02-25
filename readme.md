@@ -1,5 +1,8 @@
 # Random warp bg fetcher
 
+I've been running into some issues lately. This might only work if you also have
+a browser open to the deep dream url.
+
 Scrapes the latest deep dream image and downloads it into your warp theme
 directory.
 
