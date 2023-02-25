@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const IMAGE_URL = "https://deepdreamgenerator.com/";
+const IMAGE_SITE_URL = "https://deepdreamgenerator.com/";
 const cheerio = require("cheerio");
 const axios = require("axios");
 const fs = require("fs");
@@ -11,7 +11,7 @@ const argv = require("yargs/yargs")(process.argv.slice(2)).argv;
 
 function getImage(theme = "night_owl") {
   console.log(`Fetching new background for your warp theme ${theme}`);
-  return axios.get(IMAGE_URL).then(function({ data }) {
+  return axios.get(IMAGE_SITE_URL).then(function({ data }) {
     // scrape the image
     let $ = cheerio.load(data);
 
@@ -20,6 +20,7 @@ function getImage(theme = "night_owl") {
     const imageIndex = Math.floor((Math.random() * images.length) / 2);
     console.log(images[imageIndex].attribs);
     const firstImageUrl = images[imageIndex].attribs.src;
+    console.log({ firstImageUrl });
     // save the image
     axios({
       method: "get",
