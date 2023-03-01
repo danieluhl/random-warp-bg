@@ -15,11 +15,6 @@ background_image:
 
 ## Example Usage
 
-### NOTE!
-
-You do need to visit `https://deepdreamgenerator.com/` before running this
-script.
-
 ```bash
 # downloads to ~/.warp/themes/night_owl/deep.jpg
 node index.js night_owl
