@@ -1,5 +1,6 @@
-#!/bin/sh
-":"; //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
+#!/usr/bin/env node
+// #!/bin/sh
+// ":"; //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
 
 const IMAGE_SITE_URL = "https://deepdreamgenerator.com/";
 const cheerio = require("cheerio");
