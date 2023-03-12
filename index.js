@@ -29,7 +29,7 @@ function didAlreadyFetch() {
   const { lastFetchedDay } = JSON.parse(
     fs.readFileSync(path.join(THEME_PATH, ".random_bg_data.json"))
   );
-  const today = new Date().getDay();
+  const today = new Date().getDate();
   console.log({ lastFetchedDay, today });
   // update the date in the file
   fs.writeFileSync(
