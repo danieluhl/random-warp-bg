@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// #!/bin/sh
-// ":"; //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
 
 const IMAGE_SITE_URL = "https://deepdreamgenerator.com/";
 const cheerio = require("cheerio");
@@ -8,6 +6,8 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
 const homedir = require("os").homedir();
+const sizeOf = require("image-size");
+const https = require("https");
 
 const argv = require("yargs/yargs")(process.argv.slice(2)).argv;
 
@@ -40,50 +40,78 @@ function didAlreadyFetch() {
   return lastFetchedDay === today;
 }
 
-function saveImage(imageUrl, savePath) {
-  axios({
-    method: "get",
-    url: imageUrl,
-    responseType: "stream",
-  })
-    .then(function(response) {
-      response.data.pipe(
-        fs.createWriteStream(savePath, {
-          flags: "w",
-        })
-      );
-    })
-    .catch((e) => {
-      console.log("err on saving image", e);
-    });
-}
+const saveImage = (imageUrl, savePath) => {
+  return new Promise((res, rej) => {
+    https.get(imageUrl, (response) => {
+      response.on("error", (error) => {
+        console.error(error);
+        rej(error);
+      });
 
-function getImage() {
-  console.log(`Fetching new background for warp...`);
+      const file = fs.createWriteStream(savePath, {
+        flags: "w",
+      });
+
+      file.on("finish", () => {
+        console.log("File saved successfully");
+        res(savePath);
+      });
+
+      response.pipe(file);
+    });
+  });
+};
+
+let imageCache;
+
+const fetchImageUrls = () => {
   return axios.get(IMAGE_SITE_URL).then(function({ data }) {
     // scrape the image url
     let $ = cheerio.load(data);
 
-    const images = $(".container .content img.light-gallery-item");
-    console.log(`found ${images.length} images...`);
-    // grab one of the top half of all the images on the main page
-    const imageIndex = Math.floor((Math.random() * images.length) / 2);
-    let firstImageUrl = images[imageIndex].attribs.src;
-    if (!firstImageUrl) {
-      // sometimes its data-src
-      firstImageUrl = images[imageIndex].attribs["data-src"];
-    }
-    console.log({ firstImageUrl });
-    return firstImageUrl;
+    const images = Array.from($(".container .content img.light-gallery-item"));
+    const urls = images.map((img) => img.attribs["data-src"]).filter(Boolean);
+    // shuffle
+    urls.sort((a, b) => (Math.random() > 0.5 ? 1 : -1));
+    console.log(`found ${urls.length} images...`);
+    return urls;
   });
+};
+
+async function downloadGoodImage() {
+  console.log(`Fetching new background for warp...`);
+
+  if (!imageCache) {
+    console.log("fetching new images");
+    imageCache = await fetchImageUrls();
+  }
+
+  let hasGoodImage;
+  let nextUrl;
+  const savePath = path.join(THEME_PATH, `${THEME_NAME}.jpg`);
+  while (!hasGoodImage && imageCache.length > 0) {
+    nextUrl = imageCache.pop();
+    const img = await saveImage(nextUrl, savePath);
+
+    const size = await sizeOf(savePath);
+    if (size && size.width > size.height) {
+      hasGoodImage = true;
+    }
+  }
+  return { src: nextUrl, path: savePath };
 }
 
 function main(force) {
   checkAndAddTheme();
   if (force || !didAlreadyFetch()) {
-    getImage().then((imageUrl) => {
-      saveImage(imageUrl, path.join(THEME_PATH, `${THEME_NAME}.jpg`));
-      console.log('ALL SET! Restart warp and pick the "Random Bg" theme!');
+    downloadGoodImage().then(({ src, path }) => {
+      if (!src) {
+        console.error("Sorry, we were unable to find any good images today");
+      } else {
+        console.log(`New background downloaded, restart warp to check it out!`);
+        console.log(`src: ${src}`);
+        console.log(`to: ${path}`);
+      }
     });
   } else {
     console.log(
